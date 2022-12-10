@@ -7,6 +7,7 @@
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_details.xml" value="0.1703125" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_popular_shows.xml" value="0.18" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/progress_animation.xml" value="0.1" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/tv_show_container.xml" value="0.25" />
       </map>
     </option>
