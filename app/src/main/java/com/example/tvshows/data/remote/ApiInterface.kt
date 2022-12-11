@@ -1,5 +1,6 @@
 package com.example.tvshows.data.remote
 
+import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.pojo.TvShowsResponse
 import com.example.tvshows.utils.TVUtils
 import retrofit2.Response
@@ -13,6 +14,11 @@ interface ApiInterface {
         @Query("page") page: Int
     ): Response<TvShowsResponse>
 
+
+    @GET(TVUtils.SHOW_DETAILS_END_POINT)
+    suspend fun getShowDetails(
+        @Query("q") q: Int
+    ): Response<TvShowDetails>
 
 
 }

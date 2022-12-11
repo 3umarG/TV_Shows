@@ -12,9 +12,10 @@ import com.example.tvshows.R
 import com.example.tvshows.databinding.TvShowContainerBinding
 import com.example.tvshows.pojo.TvShow
 
-class TvShowsRecyclerViewAdapter(val context: Context) :
+class TvShowsRecyclerViewAdapter(private val context: Context) :
     RecyclerView.Adapter<TvShowsRecyclerViewAdapter.TvShowViewHolder>() {
 
+    private var onItemClickListener: ((TvShow) -> Unit)? = null
 
     private val differCallback = object : DiffUtil.ItemCallback<TvShow>() {
         override fun areItemsTheSame(oldItem: TvShow, newItem: TvShow): Boolean {
@@ -30,15 +31,25 @@ class TvShowsRecyclerViewAdapter(val context: Context) :
     class TvShowViewHolder(private val binding: TvShowContainerBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(tvShow: TvShow , context: Context) {
+        fun bind(tvShow: TvShow, context: Context) {
             binding.tvShowName.text = tvShow.name
             binding.tvShowNetwork.text = tvShow.network
             binding.tvShowStatus.text = tvShow.status
             binding.tvShowStarted.text = tvShow.start_date
             if (tvShow.status == "Ended") {
-                binding.tvShowStatus.setTextColor(ContextCompat.getColor(context, R.color.colorThemeExtra))
+                binding.tvShowStatus.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorThemeExtra
+                    )
+                )
             } else if (tvShow.status == "Running") {
-                binding.tvShowStatus.setTextColor(ContextCompat.getColor(context, R.color.colorTextOther))
+                binding.tvShowStatus.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorTextOther
+                    )
+                )
             }
             Glide.with(itemView).load(tvShow.image_thumbnail_path)
                 .placeholder(R.drawable.progress_animation)
@@ -60,10 +71,24 @@ class TvShowsRecyclerViewAdapter(val context: Context) :
     }
 
     override fun onBindViewHolder(holder: TvShowViewHolder, position: Int) {
-        holder.bind(differ.currentList[position] , context)
+        val tvShow = differ.currentList[position]
+        holder.bind(tvShow, context)
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.let {
+                it(tvShow)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
+
+    fun setOnItemClickListener(listener: (TvShow) -> Unit) {
+        onItemClickListener = listener
+    }
+
+
+
+
 }

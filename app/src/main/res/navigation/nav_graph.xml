@@ -9,5 +9,20 @@
         android:id="@+id/popularShowsFragment"
         android:name="com.example.tvshows.ui.fragments.PopularShowsFragment"
         android:label="fragment_popular_shows"
-        tools:layout="@layout/fragment_popular_shows" />
+        tools:layout="@layout/fragment_popular_shows" >
+        <action
+            android:id="@+id/action_popularShowsFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment"
+            app:enterAnim="@anim/nav_default_pop_enter_anim"
+            app:exitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="com.example.tvshows.ui.fragments.DetailsFragment"
+        android:label="fragment_details"
+        tools:layout="@layout/fragment_details" >
+        <argument
+            android:name="tvShowId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

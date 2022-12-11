@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tvshows.R
@@ -28,7 +29,14 @@ class PopularShowsFragment : Fragment() {
     private var currentList: MutableList<TvShow> = mutableListOf()
     private var newList: MutableList<TvShow> = mutableListOf()
     private var isLoadingMore = false
+    private var flag = true
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        flag = true
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,10 +51,7 @@ class PopularShowsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getMostPopular(currentPage)
-
         setupRecyclerViewAndAdapter()
-
         viewModel.tvShowsResponse.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -55,11 +60,11 @@ class PopularShowsFragment : Fragment() {
                     currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
                     newList.addAll(currentList)
                     rvAdapter.differ.submitList(newList)
-                   if (isLoadingMore){
-                       binding.rvTvShows.adapter?.notifyItemChanged(rvAdapter.differ.currentList.size)
-                       isLoadingMore = false
-                       binding.progressBarLoadingMore.visibility = View.GONE
-                   }
+                    if (isLoadingMore) {
+                        binding.rvTvShows.adapter?.notifyItemChanged(rvAdapter.differ.currentList.size)
+                        isLoadingMore = false
+                        binding.progressBarLoadingMore.visibility = View.GONE
+                    }
                 }
                 is Resource.Loading -> {
                     if (isLoadingMore) {
@@ -77,7 +82,6 @@ class PopularShowsFragment : Fragment() {
             }
 
         }
-
         binding.rvTvShows.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -91,16 +95,32 @@ class PopularShowsFragment : Fragment() {
             }
         })
 
+        if (flag) {
+            viewModel.getMostPopular(currentPage)
+        } else {
+            Toast.makeText(context, "No More Load !!", Toast.LENGTH_LONG).show()
+        }
 
     }
 
     private fun setupRecyclerViewAndAdapter() {
         rvAdapter = activity?.applicationContext?.let { TvShowsRecyclerViewAdapter(it) }!!
+        rvAdapter.setOnItemClickListener {
+            val action =
+                PopularShowsFragmentDirections.actionPopularShowsFragmentToDetailsFragment(it.id)
+            findNavController().navigate(action)
+        }
         binding.rvTvShows.apply {
             adapter = rvAdapter
             layoutManager = LinearLayoutManager(context)
             edgeEffectFactory = BounceEdgeEffectFactory()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        flag = false
+
     }
 
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.pojo.TvShowsResponse
 import com.example.tvshows.repository.TvRepository
 import com.example.tvshows.utils.Resource
@@ -12,6 +13,8 @@ import retrofit2.Response
 
 class TvShowsViewModel : ViewModel() {
     private var repo = TvRepository()
+
+    // Popular Movies
     private var tvShowsMutable: MutableLiveData<Resource<TvShowsResponse>> = MutableLiveData()
     val tvShowsResponse = tvShowsMutable as LiveData<Resource<TvShowsResponse>>
 
@@ -29,6 +32,27 @@ class TvShowsViewModel : ViewModel() {
         }
         return Resource.Error(message = response.message())
 
+    }
+
+
+
+    // Details
+    private var tvShowDetailsMutable: MutableLiveData<Resource<TvShowDetails>> = MutableLiveData()
+    val tvShowDetails = tvShowDetailsMutable as LiveData<Resource<TvShowDetails>>
+
+    fun getShowDetails(id: Int) = viewModelScope.launch {
+        tvShowDetailsMutable.postValue(Resource.Loading())
+        val response = repo.getShowDetails(id)
+        tvShowDetailsMutable.postValue(handleDetailsResponse(response))
+    }
+
+    private fun handleDetailsResponse(response: Response<TvShowDetails>): Resource<TvShowDetails> {
+        if (response.isSuccessful) {
+            response.body()?.let { details ->
+                return Resource.Success(details)
+            }
+        }
+        return Resource.Error(message = response.message())
     }
 
 
