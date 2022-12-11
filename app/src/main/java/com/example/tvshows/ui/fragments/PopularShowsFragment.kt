@@ -7,17 +7,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.tvshows.R
 import com.example.tvshows.adapters.TvShowsRecyclerViewAdapter
 import com.example.tvshows.databinding.FragmentPopularShowsBinding
+import com.example.tvshows.pojo.TvShow
+import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.TvShowsViewModel
 import com.example.tvshows.utils.Resource
+import okhttp3.internal.notify
+import okhttp3.internal.notifyAll
 
 class PopularShowsFragment : Fragment() {
     private lateinit var binding: FragmentPopularShowsBinding
     private lateinit var viewModel: TvShowsViewModel
     private lateinit var rvAdapter: TvShowsRecyclerViewAdapter
+    private var currentPage = 1
+    private var nextPage = currentPage + 1
+    private var currentList: MutableList<TvShow> = mutableListOf()
+    private var newList: MutableList<TvShow> = mutableListOf()
+    private var isLoadingMore = false
 
 
     override fun onCreateView(
@@ -33,7 +43,7 @@ class PopularShowsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getMostPopular(0)
+        viewModel.getMostPopular(currentPage)
 
         setupRecyclerViewAndAdapter()
 
@@ -42,12 +52,22 @@ class PopularShowsFragment : Fragment() {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.rvTvShows.visibility = View.VISIBLE
-                    val tvShows = resource.data?.tv_shows
-                    rvAdapter.differ.submitList(tvShows)
+                    currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
+                    newList.addAll(currentList)
+                    rvAdapter.differ.submitList(newList)
+                   if (isLoadingMore){
+                       binding.rvTvShows.adapter?.notifyItemChanged(rvAdapter.differ.currentList.size)
+                       isLoadingMore = false
+                       binding.progressBarLoadingMore.visibility = View.GONE
+                   }
                 }
                 is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.rvTvShows.visibility = View.GONE
+                    if (isLoadingMore) {
+                        binding.progressBarLoadingMore.visibility = View.VISIBLE
+                    } else {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.rvTvShows.visibility = View.GONE
+                    }
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
@@ -58,6 +78,19 @@ class PopularShowsFragment : Fragment() {
 
         }
 
+        binding.rvTvShows.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!binding.rvTvShows.canScrollVertically(1)) {
+                    isLoadingMore = true
+//                    binding.progressBarLoadingMore.visibility = View.VISIBLE
+                    viewModel.getMostPopular(nextPage)
+                    currentPage = nextPage
+                    nextPage++
+                }
+            }
+        })
+
 
     }
 
@@ -66,6 +99,7 @@ class PopularShowsFragment : Fragment() {
         binding.rvTvShows.apply {
             adapter = rvAdapter
             layoutManager = LinearLayoutManager(context)
+            edgeEffectFactory = BounceEdgeEffectFactory()
         }
     }
 
