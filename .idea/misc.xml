@@ -5,6 +5,8 @@
       <map>
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/bg_container.xml" value="0.2" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/carousal_bg.xml" value="0.157" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/indicator_active.xml" value="0.192" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/indicator_inactive.xml" value="0.157" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/shade_bg.xml" value="0.157" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/carousal_image_slider.xml" value="0.33" />

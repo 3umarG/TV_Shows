@@ -1,25 +1,24 @@
 package com.example.tvshows.ui.fragments
 
-import android.content.res.Resources
 import android.os.Bundle
 
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.CompositePageTransformer
-import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import com.example.tvshows.R
 import com.example.tvshows.adapters.CarousalSliderAdapter
 import com.example.tvshows.databinding.FragmentDetailsBinding
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.TvShowsViewModel
 import com.example.tvshows.utils.Resource
-import kotlin.math.abs
-import kotlin.math.max
+import kotlinx.android.synthetic.main.fragment_details.view.*
 
 class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
@@ -54,7 +53,14 @@ class DetailsFragment : Fragment() {
                         setupAdapter(it)
                     }
                     setupViewPager()
-//                    setUpTransformer()
+                    resources.data?.tvShow?.pictures?.size?.let { setUpIndicator(it) }
+                    binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+                        override fun onPageSelected(position: Int) {
+                            super.onPageSelected(position)
+                            setupActiveIndicator(position)
+                        }
+
+                    })
                 }
                 is Resource.Error -> {
                     binding.progressBarLoadingDetails.visibility = View.GONE
@@ -95,6 +101,49 @@ class DetailsFragment : Fragment() {
     }
 
 
+    private fun setUpIndicator(count: Int) {
+        val indicators = arrayListOf<ImageView>()
+        val layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.setMargins(0, 0, 8, 0)
+        for (i in 0 until count) {
+            indicators.add(i, ImageView(activity?.applicationContext))
+            indicators[i].setImageDrawable(
+                ContextCompat.getDrawable(
+                    activity?.applicationContext!!,
+                    R.drawable.indicator_inactive
+                )
+            )
+            indicators[i].layoutParams = layoutParams
+            binding.layoutIndicator.addView(indicators[i])
+        }
+        binding.layoutIndicator.visibility = View.VISIBLE
+        setupActiveIndicator(0)
+    }
+
+    private fun setupActiveIndicator(position: Int) {
+        val childCount = binding.layoutIndicator.childCount
+        for (i in 0 until childCount) {
+            val imageView = binding.layoutIndicator.getChildAt(i) as ImageView
+            if (position == i) {
+                imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        activity?.applicationContext!!, R.drawable.indicator_active
+                    )
+                )
+            } else {
+                imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        activity?.applicationContext!!, R.drawable.indicator_inactive
+                    )
+                )
+            }
+
+        }
+    }
+
+
     /*
     private fun setUpTransformer() {
         // Padding
@@ -113,7 +162,7 @@ class DetailsFragment : Fragment() {
         viewPager.setPageTransformer(ZoomOutPageTransformer())
     }
 
-    
+
     class ZoomOutPageTransformer : ViewPager2.PageTransformer {
         override fun transformPage(view: View, position: Float) {
             view.apply {
