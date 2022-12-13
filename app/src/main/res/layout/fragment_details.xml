@@ -50,6 +50,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:padding="@dimen/_8sdp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/fadeBg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

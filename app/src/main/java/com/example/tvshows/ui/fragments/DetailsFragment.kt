@@ -54,7 +54,8 @@ class DetailsFragment : Fragment() {
                     }
                     setupViewPager()
                     resources.data?.tvShow?.pictures?.size?.let { setUpIndicator(it) }
-                    binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+                    binding.viewPager.registerOnPageChangeCallback(object :
+                        ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
                             super.onPageSelected(position)
                             setupActiveIndicator(position)
@@ -102,7 +103,9 @@ class DetailsFragment : Fragment() {
 
 
     private fun setUpIndicator(count: Int) {
-        val indicators = arrayListOf<ImageView>()
+        binding.layoutIndicator.removeAllViews()
+        binding.layoutIndicator.visibility = View.GONE
+        val indicators = mutableListOf<ImageView>()
         val layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
@@ -216,6 +219,8 @@ class DetailsFragment : Fragment() {
             binding.tvInfo.visibility = View.VISIBLE
         }
     }
+
+
 
 
 //    companion object {
