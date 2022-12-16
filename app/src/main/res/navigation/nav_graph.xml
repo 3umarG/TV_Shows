@@ -24,5 +24,8 @@
         <argument
             android:name="tvShowId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_detailsFragment_to_popularShowsFragment"
+            app:destination="@id/popularShowsFragment" />
     </fragment>
 </navigation>
