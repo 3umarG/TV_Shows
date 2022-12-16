@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tvshows.R
 import com.example.tvshows.adapters.TvShowsRecyclerViewAdapter
 import com.example.tvshows.databinding.FragmentPopularShowsBinding
 import com.example.tvshows.pojo.TvShow
@@ -17,8 +16,6 @@ import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.TvShowsViewModel
 import com.example.tvshows.utils.Resource
-import okhttp3.internal.notify
-import okhttp3.internal.notifyAll
 
 class PopularShowsFragment : Fragment() {
     private lateinit var binding: FragmentPopularShowsBinding
@@ -29,13 +26,13 @@ class PopularShowsFragment : Fragment() {
     private var currentList: MutableList<TvShow> = mutableListOf()
     private var newList: MutableList<TvShow> = mutableListOf()
     private var isLoadingMore = false
-    private var flag = true
+    private var isFirstTimeOpened = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        flag = true
+        isFirstTimeOpened = true
     }
 
     override fun onCreateView(
@@ -57,8 +54,12 @@ class PopularShowsFragment : Fragment() {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.rvTvShows.visibility = View.VISIBLE
-                    currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
-                    newList.addAll(currentList)
+
+                    if (isFirstTimeOpened || isLoadingMore) {
+                        currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
+                        newList.addAll(currentList)
+                    }
+
                     rvAdapter.differ.submitList(newList)
                     if (isLoadingMore) {
                         binding.rvTvShows.adapter?.notifyItemChanged(rvAdapter.differ.currentList.size)
@@ -95,10 +96,8 @@ class PopularShowsFragment : Fragment() {
             }
         })
 
-        if (flag) {
+        if (isFirstTimeOpened) {
             viewModel.getMostPopular(currentPage)
-        } else {
-            Toast.makeText(context, "No More Load !!", Toast.LENGTH_LONG).show()
         }
 
     }
@@ -119,7 +118,7 @@ class PopularShowsFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        flag = false
+        isFirstTimeOpened = false
 
     }
 
