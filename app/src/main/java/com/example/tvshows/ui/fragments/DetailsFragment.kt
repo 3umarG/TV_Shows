@@ -1,6 +1,9 @@
 package com.example.tvshows.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
 
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,17 +11,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.example.tvshows.R
 import com.example.tvshows.adapters.CarousalSliderAdapter
 import com.example.tvshows.databinding.FragmentDetailsBinding
 import com.example.tvshows.pojo.TvShowDetails
+import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.TvShowsViewModel
 import com.example.tvshows.utils.Resource
-import kotlinx.android.synthetic.main.fragment_details.view.*
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
@@ -34,6 +42,7 @@ class DetailsFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentDetailsBinding.inflate(inflater)
         viewModel = (activity as MainActivity).tvViewModel
+        loadingVisibility()
         return binding.root
     }
 
@@ -48,11 +57,16 @@ class DetailsFragment : Fragment() {
             when (resources) {
                 is Resource.Success -> {
                     successVisibility()
-                    binding.tvInfo.text = resources.data?.tvShow?.name
                     resources.data?.let {
                         setupAdapter(it)
+                        Glide.with(this).load(it.tvShow.image_thumbnail_path)
+                            .placeholder(R.drawable.progress_animation).into(binding.ivPoster)
+                        loadDetails(it)
                     }
                     setupViewPager()
+                    binding.ivBack.setOnClickListener {
+                        findNavController().popBackStack()
+                    }
                     resources.data?.tvShow?.pictures?.size?.let { setUpIndicator(it) }
                     binding.viewPager.registerOnPageChangeCallback(object :
                         ViewPager2.OnPageChangeCallback() {
@@ -60,15 +74,10 @@ class DetailsFragment : Fragment() {
                             super.onPageSelected(position)
                             setupActiveIndicator(position)
                         }
-
                     })
                 }
                 is Resource.Error -> {
                     binding.progressBarLoadingDetails.visibility = View.GONE
-                    binding.tvInfo.apply {
-                        visibility = View.VISIBLE
-                        text = "Error"
-                    }
                 }
                 is Resource.Loading -> {
                     loadingVisibility()
@@ -84,14 +93,11 @@ class DetailsFragment : Fragment() {
         viewPager.apply {
             clipChildren = false  // No clipping the left and right items
             clipToPadding = false  // Show the viewpager in full width without clipping the padding
-
-//            offscreenPageLimit = 3  // Render the left and right items
-//            (getChildAt(0) as RecyclerView).overScrollMode =
-//                RecyclerView.OVER_SCROLL_NEVER // Remove the scroll effect
         }
     }
 
     private fun setupAdapter(data: TvShowDetails) {
+        OverScrollDecoratorHelper.setUpOverScroll(binding.scrollView)
         val viewPagerAdapter = data.tvShow.pictures.toTypedArray().let {
             CarousalSliderAdapter(
                 it,
@@ -147,84 +153,101 @@ class DetailsFragment : Fragment() {
     }
 
 
-    /*
-    private fun setUpTransformer() {
-        // Padding
-        val compositePageTransformer = CompositePageTransformer()
-        compositePageTransformer.addTransformer(MarginPageTransformer((40 * Resources.getSystem().displayMetrics.density).toInt()))
-
-
-        // Zoom Effect :
-        compositePageTransformer.addTransformer(MarginPageTransformer((30 * Resources.getSystem().displayMetrics.density).toInt()))
-        compositePageTransformer.addTransformer { page, position ->
-            val r = 1 - kotlin.math.abs(position)
-            page.scaleY = (0.80f + r * 0.20f)
-        }
-
-
-        viewPager.setPageTransformer(ZoomOutPageTransformer())
-    }
-
-
-    class ZoomOutPageTransformer : ViewPager2.PageTransformer {
-        override fun transformPage(view: View, position: Float) {
-            view.apply {
-                val pageWidth = width
-                val pageHeight = height
-                when {
-                    position < -1 -> { // [-Infinity,-1)
-                        // This page is way off-screen to the left.
-                        alpha = 0f
-                    }
-                    position <= 1 -> { // [-1,1]
-                        // Modify the default slide transition to shrink the page as well
-                        val scaleFactor = max(MIN_SCALE, 1 - abs(position))
-                        val vertMargin = pageHeight * (1 - scaleFactor) / 2
-                        val horzMargin = pageWidth * (1 - scaleFactor) / 2
-                        translationX = horzMargin - vertMargin / 2
-                        if (position < 0) {
-                            horzMargin - vertMargin / 2
-                        } else {
-                            horzMargin + vertMargin / 2
-                        }
-
-                        // Scale the page down (between MIN_SCALE and 1)
-                        scaleX = scaleFactor
-                        scaleY = scaleFactor
-
-                        // Fade the page relative to its size.
-                        alpha = (MIN_ALPHA +
-                                (((scaleFactor - MIN_SCALE) / (1 - MIN_SCALE)) * (1 - MIN_ALPHA)))
-                    }
-                    else -> { // (1,+Infinity]
-                        // This page is way off-screen to the right.
-                        alpha = 0f
-                    }
-                }
-            }
-        }
-    }
-*/
-
     private fun loadingVisibility() {
-        binding.progressBarLoadingDetails.visibility = View.VISIBLE
-        binding.viewPager.visibility = View.GONE
-        binding.tvInfo.visibility = View.GONE
+        binding.apply {
+            progressBarLoadingDetails.visibility = View.VISIBLE
+
+            viewPager.visibility = View.GONE
+            ivPoster.visibility = View.GONE
+            textShowName.visibility = View.GONE
+            textDate.visibility = View.GONE
+            textNetwork.visibility = View.GONE
+            textStatus.visibility = View.GONE
+            textDescription.visibility = View.GONE
+            textReadMore.visibility = View.GONE
+            layoutInfo.visibility = View.GONE
+            upperBound.visibility = View.GONE
+            lowerBound.visibility = View.GONE
+            btnEpisodes.visibility = View.GONE
+            btnWebsite.visibility = View.GONE
+        }
     }
 
     private fun successVisibility() {
         binding.apply {
             progressBarLoadingDetails.visibility = View.GONE
+
             viewPager.visibility = View.VISIBLE
-            binding.tvInfo.visibility = View.VISIBLE
+            ivPoster.visibility = View.VISIBLE
+            textShowName.visibility = View.VISIBLE
+            textDate.visibility = View.VISIBLE
+            textNetwork.visibility = View.VISIBLE
+            textStatus.visibility = View.VISIBLE
+            textDescription.visibility = View.VISIBLE
+            textReadMore.visibility = View.VISIBLE
+            layoutInfo.visibility = View.VISIBLE
+            upperBound.visibility = View.VISIBLE
+            lowerBound.visibility = View.VISIBLE
+            btnEpisodes.visibility = View.VISIBLE
+            btnWebsite.visibility = View.VISIBLE
         }
     }
 
-
-
-
-//    companion object {
-//        private const val MIN_SCALE = 0.75f
-//        private const val MIN_ALPHA = 0.5f
-//    }
+    private fun loadDetails(tvShow: TvShowDetails) {
+        binding.apply {
+            textShowName.text = tvShow.tvShow.name
+            textStatus.apply {
+                text = tvShow.tvShow.status
+                if (tvShow.tvShow.status == "Ended") {
+                    this.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.colorThemeExtra
+                        )
+                    )
+                } else if (tvShow.tvShow.status == "Running") {
+                    this.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.colorTextOther
+                        )
+                    )
+                }
+            }
+            textNetwork.text = tvShow.tvShow.network
+            textDate.text = "Started on: ${tvShow.tvShow.start_date}"
+            textDescription.text = tvShow.tvShow.description
+            textReadMore.setOnClickListener {
+                if ((it as TextView).text == "Read more") {
+                    // Expand
+                    textDescription.apply {
+                        maxLines = Int.MAX_VALUE
+                        ellipsize = null
+                    }
+                    (it as TextView).text = getString(R.string.read_less)
+                } else {
+                    // Down
+                    textDescription.apply {
+                        maxLines = 4
+                        ellipsize = TextUtils.TruncateAt.END
+                    }
+                    (it as TextView).text = getString(R.string.read_more)
+                }
+            }
+            textRate.text = String.format(
+                "%.2f",
+                tvShow.tvShow.rating.toDouble()
+            )
+            textTime.text = "${tvShow.tvShow.runtime} Min"
+            textGenre.text = if (tvShow.tvShow.genres.isNotEmpty()) {
+                tvShow.tvShow.genres[0]
+            } else {
+                "N/A"
+            }
+            btnWebsite.setOnClickListener {
+                val webIntent: Intent = Intent(Intent.ACTION_VIEW, Uri.parse(tvShow.tvShow.url))
+                startActivity(webIntent)
+            }
+        }
+    }
 }
