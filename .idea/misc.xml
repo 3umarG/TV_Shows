@@ -11,8 +11,10 @@
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/carousal_image_slider.xml" value="0.33" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/carousal_item.xml" value="0.18" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/epsiodes_bottom_sheet_layout.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_details.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_popular_shows.xml" value="0.18" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/item_single_episode.xml" value="0.33" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/progress_animation.xml" value="0.1" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/tv_show_container.xml" value="0.25" />
       </map>
