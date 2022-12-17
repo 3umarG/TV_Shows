@@ -1,6 +1,7 @@
 package com.example.tvshows.ui.fragments
 
 import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,23 +10,27 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.tvshows.R
 import com.example.tvshows.adapters.CarousalSliderAdapter
+import com.example.tvshows.adapters.EpisodesAdapter
+import com.example.tvshows.databinding.EpisodesBottomSheetLayoutBinding
 import com.example.tvshows.databinding.FragmentDetailsBinding
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.TvShowsViewModel
 import com.example.tvshows.utils.Resource
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 class DetailsFragment : Fragment() {
@@ -33,6 +38,8 @@ class DetailsFragment : Fragment() {
     private lateinit var viewModel: TvShowsViewModel
     private val args by navArgs<DetailsFragmentArgs>()
     private lateinit var viewPager: ViewPager2
+    private var bottomSheetDialog: BottomSheetDialog? = null
+    private lateinit var episodesBottomSheetLayoutBinding: EpisodesBottomSheetLayoutBinding
 
 
     override fun onCreateView(
@@ -75,6 +82,51 @@ class DetailsFragment : Fragment() {
                             setupActiveIndicator(position)
                         }
                     })
+                    binding.btnEpisodes.setOnClickListener {
+                        if (bottomSheetDialog == null) {
+                            // Bottom Sheet Dialog
+                            bottomSheetDialog = BottomSheetDialog(requireActivity())
+
+                            // Episodes Bottom Sheet Layout Binding
+                            episodesBottomSheetLayoutBinding =
+                                EpisodesBottomSheetLayoutBinding.inflate(
+                                    LayoutInflater.from(requireContext()),
+                                    view.findViewById(R.id.episodesBottomSheet),
+                                    false
+                                )
+
+
+                            // Set Content View to BottomSheetDialog
+                            bottomSheetDialog?.setContentView(
+                                episodesBottomSheetLayoutBinding.root
+                            )
+                            episodesBottomSheetLayoutBinding.recyclerViewEpisodes.apply {
+                                adapter = EpisodesAdapter(resources.data?.tvShow?.episodes!!)
+                                edgeEffectFactory = BounceEdgeEffectFactory()
+                            }
+
+                            episodesBottomSheetLayoutBinding.tvTitleOfEpisodes.text =
+                                resources.data?.tvShow?.name
+                            episodesBottomSheetLayoutBinding.closeBottomSheet.setOnClickListener {
+                                bottomSheetDialog?.dismiss()
+                            }
+
+                        }
+
+                        // Starting Point
+                        val frameLayout = bottomSheetDialog?.findViewById<FrameLayout>(
+                            com.google.android.material.R.id.design_bottom_sheet
+                        )
+                        if (frameLayout != null) {
+                            val bottomSheetBehavior = BottomSheetBehavior.from(frameLayout)
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                            bottomSheetBehavior.peekHeight =
+                                Resources.getSystem().displayMetrics.heightPixels
+                        }
+
+                        // End Point
+                        bottomSheetDialog?.show()
+                    }
                 }
                 is Resource.Error -> {
                     binding.progressBarLoadingDetails.visibility = View.GONE
