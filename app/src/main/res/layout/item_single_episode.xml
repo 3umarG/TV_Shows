@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_5sdp"
+    android:background="@drawable/bg_container"
+    android:orientation="vertical"
+    android:padding="@dimen/_12sdp">
+
+    <TextView
+        android:id="@+id/episodeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/ubuntu_bold"
+        android:maxLines="1"
+        android:text="Title"
+        android:textColor="@color/colorTextIcons"
+        android:textSize="@dimen/_13sdp" />
+
+    <TextView
+        android:id="@+id/episodeName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/ubuntu_medium"
+        android:maxLines="1"
+        android:text="Name"
+        android:textColor="@color/colorTextPrimary"
+        android:textSize="@dimen/_12sdp" />
+
+    <TextView
+        android:id="@+id/episodeAirDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/ubuntu_regular"
+        android:maxLines="1"
+        android:text="Air Date"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="@dimen/_13sdp" />
+
+</LinearLayout>
