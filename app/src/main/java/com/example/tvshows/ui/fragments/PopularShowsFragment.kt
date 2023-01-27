@@ -100,6 +100,11 @@ class PopularShowsFragment : Fragment() {
             viewModel.getMostPopular(currentPage)
         }
 
+        binding.ivWatchedList.setOnClickListener {
+            val actions = PopularShowsFragmentDirections.actionPopularShowsFragmentToWatchedListFragment()
+            findNavController().navigate(actions)
+        }
+
     }
 
     private fun setupRecyclerViewAndAdapter() {

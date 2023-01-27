@@ -15,6 +15,13 @@
             app:destination="@id/detailsFragment"
             app:enterAnim="@anim/nav_default_pop_enter_anim"
             app:exitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_popularShowsFragment_to_watchedListFragment"
+            app:destination="@id/watchedListFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/detailsFragment"
@@ -31,4 +38,9 @@
             android:name="tvShow"
             app:argType="com.example.tvshows.pojo.TvShow" />
     </fragment>
+    <fragment
+        android:id="@+id/watchedListFragment"
+        android:name="com.example.tvshows.ui.fragments.WatchedListFragment"
+        android:label="fragment_watched_list"
+        tools:layout="@layout/fragment_watched_list" />
 </navigation>

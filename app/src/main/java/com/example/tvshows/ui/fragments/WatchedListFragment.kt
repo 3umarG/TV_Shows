@@ -5,56 +5,103 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.tvshows.R
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.tvshows.adapters.WatchedListAdapter
+import com.example.tvshows.databinding.FragmentWatchedListBinding
+import com.example.tvshows.pojo.TvShow
+import com.example.tvshows.ui.BounceEdgeEffectFactory
+import com.example.tvshows.ui.listeners.WatchedListListener
+import com.example.tvshows.ui.activity.MainActivity
+import com.example.tvshows.ui.listeners.RecyclerViewSwipeListener
+import com.example.tvshows.ui.viewmodel.WatchedListViewModel
+import com.google.android.material.snackbar.Snackbar
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class WatchedListFragment : Fragment(), WatchedListListener, RecyclerViewSwipeListener {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [WatchedListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class WatchedListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private lateinit var binding: FragmentWatchedListBinding
+    private lateinit var viewModel: WatchedListViewModel
+    private lateinit var watchedListAdapter: WatchedListAdapter
+    private val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            // TODO : our functionality
+            onSwipe(viewHolder)
+
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_watched_list, container, false)
+        binding = FragmentWatchedListBinding.inflate(inflater, container, false)
+        viewModel = (activity as MainActivity).watchedListViewModel
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment WatchedListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            WatchedListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        loadData()
+        navigation()
     }
+
+
+    override fun onDelete(tvShow: TvShow) {
+        viewModel.deleteTvShow(tvShow)
+        loadData()
+        Snackbar.make(requireView(), "${tvShow.name} Deleted !!", Snackbar.LENGTH_LONG).apply {
+            setAction("UNDO") {
+                viewModel.insertTvShow(tvShow)
+                loadData()
+            }
+        }.show()
+    }
+
+    override fun loadData() {
+        viewModel.getAllWatchedList().observe(viewLifecycleOwner) { watchedList ->
+            watchedListAdapter = WatchedListAdapter(watchedList, requireContext())
+            watchedListAdapter.setOnDeleteClick {
+                onDelete(it)
+            }
+            binding.rvWatchedList.apply {
+                adapter = watchedListAdapter
+                layoutManager = LinearLayoutManager(context)
+                edgeEffectFactory = BounceEdgeEffectFactory()
+            }
+        }
+        ItemTouchHelper(itemTouchHelperCallback).apply {
+            attachToRecyclerView(binding.rvWatchedList)
+        }
+    }
+
+    override fun navigation() {
+        binding.ivBackWatchedList.setOnClickListener {
+            findNavController().popBackStack()
+        }
+    }
+
+    override fun onSwipe(viewHolder: RecyclerView.ViewHolder) {
+        val tvShow = watchedListAdapter.getWatchedList()[viewHolder.absoluteAdapterPosition]
+        onDelete(tvShow)
+    }
+
+
 }
