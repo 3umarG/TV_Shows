@@ -321,4 +321,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingAdd"
+        android:layout_width="@dimen/_35sdp"
+        android:layout_height="@dimen/_35sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="@dimen/_16sdp"
+        android:backgroundTint="@color/colorThemeExtra"
+        android:src="@drawable/ic_baseline_add_24"
+        app:fabSize="normal"
+        android:tintMode="@color/white"
+        app:fabCustomSize="@dimen/_35sdp"
+        android:contentDescription="Floating" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

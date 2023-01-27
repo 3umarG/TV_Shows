@@ -10,10 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,6 +21,7 @@ import com.example.tvshows.adapters.CarousalSliderAdapter
 import com.example.tvshows.adapters.EpisodesAdapter
 import com.example.tvshows.databinding.EpisodesBottomSheetLayoutBinding
 import com.example.tvshows.databinding.FragmentDetailsBinding
+import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
@@ -31,6 +29,7 @@ import com.example.tvshows.ui.viewmodel.TvShowsViewModel
 import com.example.tvshows.utils.Resource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 class DetailsFragment : Fragment() {
@@ -40,6 +39,7 @@ class DetailsFragment : Fragment() {
     private lateinit var viewPager: ViewPager2
     private var bottomSheetDialog: BottomSheetDialog? = null
     private lateinit var episodesBottomSheetLayoutBinding: EpisodesBottomSheetLayoutBinding
+    private var isAddedOrNot : Boolean = false
 
 
     override fun onCreateView(
@@ -127,6 +127,10 @@ class DetailsFragment : Fragment() {
                         // End Point
                         bottomSheetDialog?.show()
                     }
+
+                    binding.floatingAdd.setOnClickListener {
+                        addToWatchedList(it as FloatingActionButton)
+                    }
                 }
                 is Resource.Error -> {
                     binding.progressBarLoadingDetails.visibility = View.GONE
@@ -139,6 +143,15 @@ class DetailsFragment : Fragment() {
         }
 
 
+    }
+
+    private fun addToWatchedList(fab: FloatingActionButton) {
+        // Update the Icon
+
+        fab.setImageResource(R.drawable.ic_baseline_check_24)
+
+        viewModel.insertTvShowToWatchedList(args.tvShow)
+        Toast.makeText(context, "Show added successfully", Toast.LENGTH_LONG).show()
     }
 
     private fun setupViewPager() {
@@ -208,40 +221,16 @@ class DetailsFragment : Fragment() {
     private fun loadingVisibility() {
         binding.apply {
             progressBarLoadingDetails.visibility = View.VISIBLE
-
-            viewPager.visibility = View.GONE
-            ivPoster.visibility = View.GONE
-            textShowName.visibility = View.GONE
-            textDate.visibility = View.GONE
-            textNetwork.visibility = View.GONE
-            textStatus.visibility = View.GONE
-            textDescription.visibility = View.GONE
-            textReadMore.visibility = View.GONE
-            layoutInfo.visibility = View.GONE
-            upperBound.visibility = View.GONE
-            lowerBound.visibility = View.GONE
-            btnEpisodes.visibility = View.GONE
-            btnWebsite.visibility = View.GONE
+            scrollView.visibility = View.GONE
+            floatingAdd.visibility = View.GONE
         }
     }
 
     private fun successVisibility() {
         binding.apply {
             progressBarLoadingDetails.visibility = View.GONE
-
-            viewPager.visibility = View.VISIBLE
-            ivPoster.visibility = View.VISIBLE
-            textShowName.visibility = View.VISIBLE
-            textDate.visibility = View.VISIBLE
-            textNetwork.visibility = View.VISIBLE
-            textStatus.visibility = View.VISIBLE
-            textDescription.visibility = View.VISIBLE
-            textReadMore.visibility = View.VISIBLE
-            layoutInfo.visibility = View.VISIBLE
-            upperBound.visibility = View.VISIBLE
-            lowerBound.visibility = View.VISIBLE
-            btnEpisodes.visibility = View.VISIBLE
-            btnWebsite.visibility = View.VISIBLE
+            scrollView.visibility = View.VISIBLE
+            floatingAdd.visibility = View.VISIBLE
         }
     }
 
@@ -300,6 +289,14 @@ class DetailsFragment : Fragment() {
                 val webIntent: Intent = Intent(Intent.ACTION_VIEW, Uri.parse(tvShow.tvShow.url))
                 startActivity(webIntent)
             }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.apply {
+            scrollView.visibility = View.GONE
+            progressBarLoadingDetails.visibility = View.GONE
         }
     }
 }

@@ -106,7 +106,7 @@ class PopularShowsFragment : Fragment() {
         rvAdapter = activity?.applicationContext?.let { TvShowsRecyclerViewAdapter(it) }!!
         rvAdapter.setOnItemClickListener {
             val action =
-                PopularShowsFragmentDirections.actionPopularShowsFragmentToDetailsFragment(it.id)
+                PopularShowsFragmentDirections.actionPopularShowsFragmentToDetailsFragment(it.id!! , it)
             findNavController().navigate(action)
         }
         binding.rvTvShows.apply {

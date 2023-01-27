@@ -1,9 +1,12 @@
 package com.example.tvshows.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tvshows.data.local.TvShowsDataBase
+import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.pojo.TvShowsResponse
 import com.example.tvshows.repository.TvRepository
@@ -11,8 +14,10 @@ import com.example.tvshows.utils.Resource
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class TvShowsViewModel : ViewModel() {
-    private var repo = TvRepository()
+class TvShowsViewModel(
+    private val repo: TvRepository
+) : ViewModel() {
+
 
     // Popular Movies
     private var tvShowsMutable: MutableLiveData<Resource<TvShowsResponse>> = MutableLiveData()
@@ -35,7 +40,6 @@ class TvShowsViewModel : ViewModel() {
     }
 
 
-
     // Details
     private var tvShowDetailsMutable: MutableLiveData<Resource<TvShowDetails>> = MutableLiveData()
     val tvShowDetails = tvShowDetailsMutable as LiveData<Resource<TvShowDetails>>
@@ -54,6 +58,17 @@ class TvShowsViewModel : ViewModel() {
         }
         return Resource.Error(message = response.message())
     }
+
+
+    fun insertTvShowToWatchedList(tvShow: TvShow) = viewModelScope.launch {
+        repo.addTvShowToWatchedList(tvShow)
+    }
+
+    fun deleteTvShowFromWatchedList(tvShow: TvShow) = viewModelScope.launch {
+        repo.deleteTvShowFromWatchedList(tvShow)
+    }
+
+    fun getAllWatchedList(): LiveData<List<TvShow>> = repo.getAllWatchedList()
 
 
 }

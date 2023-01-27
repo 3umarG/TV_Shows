@@ -27,5 +27,8 @@
         <action
             android:id="@+id/action_detailsFragment_to_popularShowsFragment"
             app:destination="@id/popularShowsFragment" />
+        <argument
+            android:name="tvShow"
+            app:argType="com.example.tvshows.pojo.TvShow" />
     </fragment>
 </navigation>
