@@ -1,11 +1,9 @@
-package com.example.tvshows.ui.viewmodel
+package com.example.tvshows.ui.viewmodel.tv_shows
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tvshows.data.local.TvShowsDataBase
 import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.pojo.TvShowsResponse
@@ -36,7 +34,6 @@ class TvShowsViewModel(
             }
         }
         return Resource.Error(message = response.message())
-
     }
 
 

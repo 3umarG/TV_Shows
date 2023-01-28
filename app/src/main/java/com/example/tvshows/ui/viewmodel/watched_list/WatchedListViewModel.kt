@@ -1,4 +1,4 @@
-package com.example.tvshows.ui.viewmodel
+package com.example.tvshows.ui.viewmodel.watched_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

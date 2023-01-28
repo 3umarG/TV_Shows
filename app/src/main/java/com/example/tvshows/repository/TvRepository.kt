@@ -9,6 +9,8 @@ class TvRepository(private val db: TvShowsDataBase) {
 
     suspend fun getShowDetails(id: Int) = RetrofitInstance.api.getShowDetails(id)
 
+    suspend fun search(q: String, page: Int) = RetrofitInstance.api.search(q, page)
+
     suspend fun addTvShowToWatchedList(tvShow: TvShow) = db.getDao().insertTvShow(tvShow)
 
     suspend fun deleteTvShowFromWatchedList(tvShow: TvShow) = db.getDao().deleteTvShow(tvShow)

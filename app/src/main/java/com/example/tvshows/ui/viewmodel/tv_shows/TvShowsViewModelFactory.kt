@@ -1,11 +1,11 @@
-package com.example.tvshows.ui.viewmodel
+package com.example.tvshows.ui.viewmodel.tv_shows
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.tvshows.repository.TvRepository
 
-class WatchedListViewModelFactory(private val repository: TvRepository) : ViewModelProvider.Factory {
+class TvShowsViewModelFactory(private val repository: TvRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return WatchedListViewModel(repository) as T
+        return TvShowsViewModel(repository) as T
     }
 }

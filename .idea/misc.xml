@@ -5,15 +5,18 @@
       <map>
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/bg_container.xml" value="0.2" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/carousal_bg.xml" value="0.157" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/ic_search.xml" value="0.168" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/indicator_active.xml" value="0.192" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/indicator_inactive.xml" value="0.157" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/drawable/shade_bg.xml" value="0.157" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout-v26/fragment_search_tv_show.xml" value="0.18489583333333334" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/carousal_image_slider.xml" value="0.33" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/carousal_item.xml" value="0.18" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/epsiodes_bottom_sheet_layout.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_details.xml" value="0.25" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_popular_shows.xml" value="0.18" />
+        <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_search_tv_show.xml" value="0.22" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/fragment_watched_list.xml" value="0.22" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/item_single_episode.xml" value="0.33" />
         <entry key="..\:/android/KotlinProjects/TVShows/app/src/main/res/layout/progress_animation.xml" value="0.1" />

@@ -16,7 +16,7 @@ import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.listeners.WatchedListListener
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.listeners.RecyclerViewSwipeListener
-import com.example.tvshows.ui.viewmodel.WatchedListViewModel
+import com.example.tvshows.ui.viewmodel.watched_list.WatchedListViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class WatchedListFragment : Fragment(), WatchedListListener, RecyclerViewSwipeListener {

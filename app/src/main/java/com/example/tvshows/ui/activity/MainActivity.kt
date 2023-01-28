@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.tvshows.R
 import com.example.tvshows.data.local.TvShowsDataBase
 import com.example.tvshows.repository.TvRepository
-import com.example.tvshows.ui.viewmodel.TvShowsViewModel
-import com.example.tvshows.ui.viewmodel.TvShowsViewModelFactory
-import com.example.tvshows.ui.viewmodel.WatchedListViewModel
-import com.example.tvshows.ui.viewmodel.WatchedListViewModelFactory
+import com.example.tvshows.ui.viewmodel.search.SearchViewModel
+import com.example.tvshows.ui.viewmodel.search.SearchViewModelFactory
+import com.example.tvshows.ui.viewmodel.tv_shows.TvShowsViewModel
+import com.example.tvshows.ui.viewmodel.tv_shows.TvShowsViewModelFactory
+import com.example.tvshows.ui.viewmodel.watched_list.WatchedListViewModel
+import com.example.tvshows.ui.viewmodel.watched_list.WatchedListViewModelFactory
 
 class MainActivity : AppCompatActivity() {
     lateinit var tvViewModel: TvShowsViewModel
@@ -17,6 +19,10 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var watchedListViewModel: WatchedListViewModel
     private lateinit var watchedListViewModelFactory: WatchedListViewModelFactory
+
+    lateinit var searchViewModel: SearchViewModel
+    lateinit var searchViewModelFactory: SearchViewModelFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -38,6 +44,15 @@ class MainActivity : AppCompatActivity() {
             )
         watchedListViewModel =
             ViewModelProvider(this, watchedListViewModelFactory)[WatchedListViewModel::class.java]
+
+
+        searchViewModelFactory = SearchViewModelFactory(
+            repository = TvRepository(
+                TvShowsDataBase.createDatabase(this)
+            )
+        )
+        searchViewModel =
+            ViewModelProvider(this, searchViewModelFactory)[SearchViewModel::class.java]
 
     }
 

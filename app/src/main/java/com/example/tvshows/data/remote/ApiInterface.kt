@@ -21,4 +21,10 @@ interface ApiInterface {
     ): Response<TvShowDetails>
 
 
+    @GET(TVUtils.SEARCH_END_PONT)
+    suspend fun search(
+        @Query("q") q: String,
+        @Query("page") page: Int
+    ) : Response<TvShowsResponse>
+
 }

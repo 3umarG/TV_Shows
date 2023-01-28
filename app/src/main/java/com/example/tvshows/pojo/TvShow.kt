@@ -2,7 +2,6 @@ package com.example.tvshows.pojo
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.android.parcel.RawValue
 import java.io.Serializable
 
 @Entity(tableName = "tvShows")

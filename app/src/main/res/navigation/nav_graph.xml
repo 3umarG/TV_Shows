@@ -22,6 +22,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_popularShowsFragment_to_searchTvShowFragment"
+            app:destination="@id/searchTvShowFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailsFragment"
@@ -43,4 +46,13 @@
         android:name="com.example.tvshows.ui.fragments.WatchedListFragment"
         android:label="fragment_watched_list"
         tools:layout="@layout/fragment_watched_list" />
+    <fragment
+        android:id="@+id/searchTvShowFragment"
+        android:name="com.example.tvshows.ui.fragments.SearchTvShowFragment"
+        android:label="fragment_search_tv_show"
+        tools:layout="@layout/fragment_search_tv_show" >
+        <action
+            android:id="@+id/action_searchTvShowFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
 </navigation>

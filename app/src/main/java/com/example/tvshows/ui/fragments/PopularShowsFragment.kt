@@ -14,7 +14,7 @@ import com.example.tvshows.databinding.FragmentPopularShowsBinding
 import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
-import com.example.tvshows.ui.viewmodel.TvShowsViewModel
+import com.example.tvshows.ui.viewmodel.tv_shows.TvShowsViewModel
 import com.example.tvshows.utils.Resource
 
 class PopularShowsFragment : Fragment() {
@@ -105,6 +105,10 @@ class PopularShowsFragment : Fragment() {
             findNavController().navigate(actions)
         }
 
+        binding.ivSearch.setOnClickListener {
+            val actios = PopularShowsFragmentDirections.actionPopularShowsFragmentToSearchTvShowFragment()
+            findNavController().navigate(actios)
+        }
     }
 
     private fun setupRecyclerViewAndAdapter() {

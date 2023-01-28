@@ -21,11 +21,10 @@ import com.example.tvshows.adapters.CarousalSliderAdapter
 import com.example.tvshows.adapters.EpisodesAdapter
 import com.example.tvshows.databinding.EpisodesBottomSheetLayoutBinding
 import com.example.tvshows.databinding.FragmentDetailsBinding
-import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
-import com.example.tvshows.ui.viewmodel.TvShowsViewModel
+import com.example.tvshows.ui.viewmodel.tv_shows.TvShowsViewModel
 import com.example.tvshows.utils.Resource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
