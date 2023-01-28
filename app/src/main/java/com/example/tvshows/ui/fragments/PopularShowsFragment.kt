@@ -50,45 +50,7 @@ class PopularShowsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerViewAndAdapter()
-        viewModel.tvShowsResponse.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.rvTvShows.visibility = View.VISIBLE
-                    binding.lottieNoInternet.visibility = View.GONE
-
-                    if (isFirstTimeOpened || isLoadingMore) {
-                        currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
-                        newList.addAll(currentList)
-                    }
-
-                    rvAdapter.differ.submitList(newList)
-                    if (isLoadingMore) {
-                        binding.rvTvShows.adapter?.notifyItemChanged(rvAdapter.differ.currentList.size)
-                        isLoadingMore = false
-                        binding.progressBarLoadingMore.visibility = View.GONE
-                    }
-                }
-                is Resource.Loading -> {
-                    if (isLoadingMore) {
-                        binding.progressBarLoadingMore.visibility = View.VISIBLE
-                    } else {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.rvTvShows.visibility = View.GONE
-                        binding.lottieNoInternet.visibility = View.GONE
-                    }
-                }
-                is Resource.Error -> {
-                    if (resource.message == TVUtils.NO_INTERNET_CONNECTION) {
-                        binding.lottieNoInternet.visibility = View.VISIBLE
-                        Toast.makeText(context, "No Internet Connection !!", Toast.LENGTH_LONG).show()
-                    }
-                    binding.progressBar.visibility = View.GONE
-                    binding.rvTvShows.visibility = View.GONE
-                }
-            }
-
-        }
+       observation()
         binding.rvTvShows.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -140,6 +102,53 @@ class PopularShowsFragment : Fragment() {
         super.onPause()
         isFirstTimeOpened = false
 
+    }
+
+    private fun observation(){
+        viewModel.tvShowsResponse.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.rvTvShows.visibility = View.VISIBLE
+                    binding.lottieNoInternet.visibility = View.GONE
+
+                    if (isFirstTimeOpened || isLoadingMore) {
+                        currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
+                        newList.addAll(currentList)
+                    }
+
+                    rvAdapter.differ.submitList(newList)
+                    if (isLoadingMore) {
+                        binding.rvTvShows.adapter?.notifyItemChanged(rvAdapter.differ.currentList.size)
+                        isLoadingMore = false
+                        binding.progressBarLoadingMore.visibility = View.GONE
+                    }
+                }
+                is Resource.Loading -> {
+                    if (isLoadingMore) {
+                        binding.progressBarLoadingMore.visibility = View.VISIBLE
+                    } else {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.rvTvShows.visibility = View.GONE
+                        binding.lottieNoInternet.visibility = View.GONE
+                    }
+                }
+                is Resource.Error -> {
+                    if (resource.message == TVUtils.NO_INTERNET_CONNECTION) {
+                        binding.lottieNoInternet.visibility = View.VISIBLE
+                        Toast.makeText(context, "No Internet Connection !!", Toast.LENGTH_LONG).show()
+                    }
+                    binding.progressBar.visibility = View.GONE
+                    binding.rvTvShows.visibility = View.GONE
+                }
+            }
+
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observation()
     }
 
 }
