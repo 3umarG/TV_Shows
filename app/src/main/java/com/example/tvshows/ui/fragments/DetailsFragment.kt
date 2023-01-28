@@ -26,9 +26,11 @@ import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.tv_shows.TvShowsViewModel
 import com.example.tvshows.utils.Resource
+import com.example.tvshows.utils.TVUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.android.synthetic.main.fragment_details.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 class DetailsFragment : Fragment() {
@@ -132,6 +134,11 @@ class DetailsFragment : Fragment() {
                     }
                 }
                 is Resource.Error -> {
+                    if (resources.message == TVUtils.NO_INTERNET_CONNECTION){
+                        binding.scrollView.visibility = View.GONE
+                        binding.floatingAdd.visibility = View.GONE
+                        binding.lottieNoInternetDetails.visibility = View.VISIBLE
+                    }
                     binding.progressBarLoadingDetails.visibility = View.GONE
                 }
                 is Resource.Loading -> {
@@ -222,6 +229,7 @@ class DetailsFragment : Fragment() {
             progressBarLoadingDetails.visibility = View.VISIBLE
             scrollView.visibility = View.GONE
             floatingAdd.visibility = View.GONE
+            binding.lottieNoInternetDetails.visibility = View.GONE
         }
     }
 
@@ -230,6 +238,7 @@ class DetailsFragment : Fragment() {
             progressBarLoadingDetails.visibility = View.GONE
             scrollView.visibility = View.VISIBLE
             floatingAdd.visibility = View.VISIBLE
+            binding.lottieNoInternetDetails.visibility = View.GONE
         }
     }
 

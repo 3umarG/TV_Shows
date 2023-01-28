@@ -54,9 +54,16 @@ class TvShowsViewModel(
     val tvShowDetails = tvShowDetailsMutable as LiveData<Resource<TvShowDetails>>
 
     fun getShowDetails(id: Int) = viewModelScope.launch {
-        tvShowDetailsMutable.postValue(Resource.Loading())
-        val response = repo.getShowDetails(id)
-        tvShowDetailsMutable.postValue(handleDetailsResponse(response))
+        connectivityObserver.observe().collect { status ->
+            if (status == ConnectivityObserver.Status.AVAILABLE) {
+                tvShowDetailsMutable.postValue(Resource.Loading())
+                val response = repo.getShowDetails(id)
+                tvShowDetailsMutable.postValue(handleDetailsResponse(response))
+            } else {
+                tvShowDetailsMutable.postValue(Resource.Error(message = TVUtils.NO_INTERNET_CONNECTION))
+            }
+
+        }
     }
 
     private fun handleDetailsResponse(response: Response<TvShowDetails>): Resource<TvShowDetails> {
