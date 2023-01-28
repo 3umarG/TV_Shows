@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import com.example.tvshows.adapters.TvShowsRecyclerViewAdapter
 import com.example.tvshows.databinding.FragmentSearchTvShowBinding
 import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.pojo.TvShowsResponse
+import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.listeners.SearchStatus
 import com.example.tvshows.ui.viewmodel.search.SearchViewModel
@@ -28,8 +30,15 @@ import kotlinx.coroutines.launch
 class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
 
 
+    private lateinit var searchAdapter: TvShowsRecyclerViewAdapter
     private lateinit var viewModel: SearchViewModel
     private lateinit var binding: FragmentSearchTvShowBinding
+    private var currentPage = 1
+    private var nextPage = currentPage + 1
+    private var currentList: MutableList<TvShow> = mutableListOf()
+    private var newList: MutableList<TvShow> = mutableListOf()
+    private var isLoadingMore = false
+    private var q: String = ""
 
 
     override fun onCreateView(
@@ -50,8 +59,16 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
             job?.cancel()
             job = MainScope().launch {
                 delay(500)
+                q = editable.toString()
                 if (editable.toString().isNotEmpty()) {
-                    viewModel.search(editable.toString(), 1)
+                    viewModel.search(q, currentPage)
+                } else {
+                    // IsEmpty Text Field
+                    // Reset for all values that affect on search
+                    currentList = mutableListOf()
+                    newList = mutableListOf()
+                    currentPage = 1
+                    nextPage = currentPage + 1
                 }
             }
         }
@@ -61,12 +78,37 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
             findNavController().popBackStack()
         }
 
+
+        // New API Call when reach the end ...
+        binding.rvSearch?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!binding.rvSearch!!.canScrollVertically(1)) {
+                    isLoadingMore = true
+                    viewModel.search(q, nextPage)
+                    currentPage = nextPage
+                    nextPage++
+                }
+            }
+        })
+
+
+
         viewModel.searchLiveData.observe(viewLifecycleOwner) {
             when (it) {
                 is Resource.Loading -> {
-                    onLoading()
+                    if (isLoadingMore) {
+                        binding.progressBarLoadingMoreSearch?.visibility = View.VISIBLE
+                    } else {
+                        onLoading()
+                    }
                 }
                 is Resource.Success -> {
+                    if (q == "") {
+                        currentList = mutableListOf()
+                        newList = mutableListOf()
+                        loadDataToRecyclerView(currentList)
+                    }
                     onSuccess(it.data!!)
                 }
                 is Resource.Error -> {
@@ -83,10 +125,19 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
     }
 
     private fun setupRecyclerView() {
-        val searchAdapter = TvShowsRecyclerViewAdapter(requireContext())
+        searchAdapter = TvShowsRecyclerViewAdapter(requireContext())
         binding.rvSearch?.apply {
             adapter = searchAdapter
             layoutManager = LinearLayoutManager(activity)
+            edgeEffectFactory = BounceEdgeEffectFactory()
+        }
+        searchAdapter.setOnItemClickListener {
+            val actions =
+                SearchTvShowFragmentDirections.actionSearchTvShowFragmentToDetailsFragment(
+                    it.id!!,
+                    it
+                )
+            findNavController().navigate(actions)
         }
     }
 
@@ -113,26 +164,27 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
                 lottieNoMatchesSearch?.visibility = View.VISIBLE
             }
         } else {
+            // Have DATA ...
             binding.lottieNoMatchesSearch?.visibility = View.GONE
             binding.rvSearch?.visibility = View.VISIBLE
-            loadDataToRecyclerView(response.tv_shows)
+            newList = response.tv_shows.toMutableList()
+            if (!currentList.containsAll(newList)) {
+                // You reach the end of pagination
+                currentList.addAll(newList)
+                loadDataToRecyclerView(currentList)
+            } else {
+                Toast.makeText(requireContext(), "You reach to the end", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
     private fun loadDataToRecyclerView(data: List<TvShow>) {
-        val searchAdapter = TvShowsRecyclerViewAdapter(requireContext())
+
         searchAdapter.differ.submitList(data)
-        searchAdapter.setOnItemClickListener {
-            val actions =
-                SearchTvShowFragmentDirections.actionSearchTvShowFragmentToDetailsFragment(
-                    it.id!!,
-                    it
-                )
-            findNavController().navigate(actions)
-        }
-        binding.rvSearch?.apply {
-            adapter = searchAdapter
-            layoutManager = LinearLayoutManager(activity)
+        if (isLoadingMore) {
+            binding.rvSearch?.adapter?.notifyItemChanged(searchAdapter.differ.currentList.size)
+            isLoadingMore = false
+            binding.progressBarLoadingMoreSearch?.visibility = View.GONE
         }
     }
 
