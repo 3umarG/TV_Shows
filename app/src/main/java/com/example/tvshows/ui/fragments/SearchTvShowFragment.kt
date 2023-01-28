@@ -19,6 +19,7 @@ import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.listeners.SearchStatus
 import com.example.tvshows.ui.viewmodel.search.SearchViewModel
 import com.example.tvshows.utils.Resource
+import com.example.tvshows.utils.TVUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -69,6 +70,10 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
                     onSuccess(it.data!!)
                 }
                 is Resource.Error -> {
+                    if (it.message == TVUtils.NO_INTERNET_CONNECTION) {
+                        println("STATUS ::: NO INTERNET CONNECTION")
+                        binding.lottieNoInternetSearch?.visibility = View.VISIBLE
+                    }
                     onError()
                 }
             }
@@ -90,6 +95,8 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
             rvSearch?.visibility = View.GONE
             progressBarSearch?.visibility = View.VISIBLE
             progressBarLoadingMoreSearch?.visibility = View.GONE
+            lottieNoInternetSearch?.visibility = View.GONE
+
         }
     }
 
@@ -98,6 +105,7 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
             rvSearch?.visibility = View.VISIBLE
             progressBarSearch?.visibility = View.GONE
             progressBarLoadingMoreSearch?.visibility = View.GONE
+            lottieNoInternetSearch?.visibility = View.GONE
         }
         loadDataToRecyclerView(response.tv_shows)
     }
@@ -106,7 +114,11 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
         val searchAdapter = TvShowsRecyclerViewAdapter(requireContext())
         searchAdapter.differ.submitList(data)
         searchAdapter.setOnItemClickListener {
-            val actions = SearchTvShowFragmentDirections.actionSearchTvShowFragmentToDetailsFragment(it.id!! , it)
+            val actions =
+                SearchTvShowFragmentDirections.actionSearchTvShowFragmentToDetailsFragment(
+                    it.id!!,
+                    it
+                )
             findNavController().navigate(actions)
         }
         binding.rvSearch?.apply {
@@ -116,7 +128,9 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
     }
 
     override fun onError() {
-
+        binding.apply {
+            rvSearch?.visibility = View.GONE
+        }
     }
 
 }

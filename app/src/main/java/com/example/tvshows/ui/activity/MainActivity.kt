@@ -50,7 +50,8 @@ class MainActivity : AppCompatActivity() {
         searchViewModelFactory = SearchViewModelFactory(
             repository = TvRepository(
                 TvShowsDataBase.createDatabase(this)
-            )
+            ),
+            applicationContext
         )
         searchViewModel =
             ViewModelProvider(this, searchViewModelFactory)[SearchViewModel::class.java]
