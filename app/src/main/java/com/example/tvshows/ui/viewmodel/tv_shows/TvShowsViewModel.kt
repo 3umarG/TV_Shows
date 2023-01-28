@@ -1,30 +1,42 @@
 package com.example.tvshows.ui.viewmodel.tv_shows
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tvshows.network.ConnectivityObserver
+import com.example.tvshows.network.InternetConnectivityObserver
 import com.example.tvshows.pojo.TvShow
 import com.example.tvshows.pojo.TvShowDetails
 import com.example.tvshows.pojo.TvShowsResponse
 import com.example.tvshows.repository.TvRepository
 import com.example.tvshows.utils.Resource
+import com.example.tvshows.utils.TVUtils
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class TvShowsViewModel(
-    private val repo: TvRepository
+    private val repo: TvRepository,
+    private val context: Context
 ) : ViewModel() {
 
+    private val connectivityObserver: ConnectivityObserver = InternetConnectivityObserver(context)
 
     // Popular Movies
     private var tvShowsMutable: MutableLiveData<Resource<TvShowsResponse>> = MutableLiveData()
     val tvShowsResponse = tvShowsMutable as LiveData<Resource<TvShowsResponse>>
 
     fun getMostPopular(page: Int) = viewModelScope.launch {
-        tvShowsMutable.postValue(Resource.Loading())
-        val response = repo.getMostPopular(page)
-        tvShowsMutable.postValue(handleResponse(response))
+        connectivityObserver.observe().collect { status ->
+            if (status == ConnectivityObserver.Status.AVAILABLE) {
+                tvShowsMutable.postValue(Resource.Loading())
+                val response = repo.getMostPopular(page)
+                tvShowsMutable.postValue(handleResponse(response))
+            }else{
+                tvShowsMutable.postValue(Resource.Error(message = TVUtils.NO_INTERNET_CONNECTION))
+            }
+        }
     }
 
     private fun handleResponse(response: Response<TvShowsResponse>): Resource<TvShowsResponse> {

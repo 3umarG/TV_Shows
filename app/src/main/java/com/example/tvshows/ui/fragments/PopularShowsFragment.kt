@@ -16,6 +16,7 @@ import com.example.tvshows.ui.BounceEdgeEffectFactory
 import com.example.tvshows.ui.activity.MainActivity
 import com.example.tvshows.ui.viewmodel.tv_shows.TvShowsViewModel
 import com.example.tvshows.utils.Resource
+import com.example.tvshows.utils.TVUtils
 
 class PopularShowsFragment : Fragment() {
     private lateinit var binding: FragmentPopularShowsBinding
@@ -54,6 +55,7 @@ class PopularShowsFragment : Fragment() {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.rvTvShows.visibility = View.VISIBLE
+                    binding.lottieNoInternet.visibility = View.GONE
 
                     if (isFirstTimeOpened || isLoadingMore) {
                         currentList = (resource.data?.tv_shows as MutableList<TvShow>?)!!
@@ -73,12 +75,16 @@ class PopularShowsFragment : Fragment() {
                     } else {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.rvTvShows.visibility = View.GONE
+                        binding.lottieNoInternet.visibility = View.GONE
                     }
                 }
                 is Resource.Error -> {
+                    if (resource.message == TVUtils.NO_INTERNET_CONNECTION) {
+                        binding.lottieNoInternet.visibility = View.VISIBLE
+                        Toast.makeText(context, "No Internet Connection !!", Toast.LENGTH_LONG).show()
+                    }
                     binding.progressBar.visibility = View.GONE
                     binding.rvTvShows.visibility = View.GONE
-                    Toast.makeText(context, "Error !!", Toast.LENGTH_LONG).show()
                 }
             }
 
@@ -101,12 +107,14 @@ class PopularShowsFragment : Fragment() {
         }
 
         binding.ivWatchedList.setOnClickListener {
-            val actions = PopularShowsFragmentDirections.actionPopularShowsFragmentToWatchedListFragment()
+            val actions =
+                PopularShowsFragmentDirections.actionPopularShowsFragmentToWatchedListFragment()
             findNavController().navigate(actions)
         }
 
         binding.ivSearch.setOnClickListener {
-            val actios = PopularShowsFragmentDirections.actionPopularShowsFragmentToSearchTvShowFragment()
+            val actios =
+                PopularShowsFragmentDirections.actionPopularShowsFragmentToSearchTvShowFragment()
             findNavController().navigate(actios)
         }
     }
@@ -115,7 +123,10 @@ class PopularShowsFragment : Fragment() {
         rvAdapter = activity?.applicationContext?.let { TvShowsRecyclerViewAdapter(it) }!!
         rvAdapter.setOnItemClickListener {
             val action =
-                PopularShowsFragmentDirections.actionPopularShowsFragmentToDetailsFragment(it.id!! , it)
+                PopularShowsFragmentDirections.actionPopularShowsFragmentToDetailsFragment(
+                    it.id!!,
+                    it
+                )
             findNavController().navigate(action)
         }
         binding.rvTvShows.apply {

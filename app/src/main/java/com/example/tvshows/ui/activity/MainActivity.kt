@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
             TvShowsViewModelFactory(
                 repository = TvRepository(
                     TvShowsDataBase.createDatabase(this)
-                )
+                ),
+                context = applicationContext
             )
         tvViewModel = ViewModelProvider(this, tvShowsViewModelFactory)[TvShowsViewModel::class.java]
 
