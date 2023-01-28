@@ -102,12 +102,21 @@ class SearchTvShowFragment : Fragment(), SearchStatus<TvShowsResponse> {
 
     override fun onSuccess(response: TvShowsResponse) {
         binding.apply {
-            rvSearch?.visibility = View.VISIBLE
             progressBarSearch?.visibility = View.GONE
             progressBarLoadingMoreSearch?.visibility = View.GONE
             lottieNoInternetSearch?.visibility = View.GONE
         }
-        loadDataToRecyclerView(response.tv_shows)
+        if (response.tv_shows.isEmpty()) {
+            // Not Found Matches ...
+            binding.apply {
+                rvSearch?.visibility = View.GONE
+                lottieNoMatchesSearch?.visibility = View.VISIBLE
+            }
+        } else {
+            binding.lottieNoMatchesSearch?.visibility = View.GONE
+            binding.rvSearch?.visibility = View.VISIBLE
+            loadDataToRecyclerView(response.tv_shows)
+        }
     }
 
     private fun loadDataToRecyclerView(data: List<TvShow>) {
